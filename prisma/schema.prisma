@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model audios {
+  id_audio             Int                    @id @default(autoincrement())
+  usuario_id           Int?
+  plantilla_id         Int?
+  url_audio            String                 @db.VarChar(255)
+  procesado            Boolean?               @default(false)
+  fecha_creacion       DateTime?              @default(now()) @db.Timestamp(6)
+  plantillas           plantillas?            @relation(fields: [plantilla_id], references: [id_plantilla], onDelete: NoAction, onUpdate: NoAction)
+  usuarios             usuarios?              @relation(fields: [usuario_id], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction)
+  documentos_generados documentos_generados[]
+}
+
+model documentos_generados {
+  id_documento   Int       @id @default(autoincrement())
+  audio_id       Int?
+  url_docx       String    @db.VarChar(255)
+  fecha_creacion DateTime? @default(now()) @db.Timestamp(6)
+  audios         audios?   @relation(fields: [audio_id], references: [id_audio], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model plantillas {
+  id_plantilla       Int       @id @default(autoincrement())
+  nombre             String    @db.VarChar(100)
+  descripcion        String?
+  contenido_json     Json
+  activo             Boolean?  @default(true)
+  fecha_creacion     DateTime? @default(now()) @db.Timestamp(6)
+  fecha_modificacion DateTime? @default(now()) @db.Timestamp(6)
+  audios             audios[]
+}
+
+model usuarios {
+  id_usuario         Int       @id @default(autoincrement())
+  nombre             String    @db.VarChar(100)
+  apellido           String    @db.VarChar(100)
+  correo             String    @unique @db.VarChar(255)
+  clave              String    @db.VarChar(255)
+  suscripcion        String    @default("free") @db.VarChar(20)
+  activo             Boolean?  @default(true)
+  ultimo_login       DateTime? @db.Timestamp(6)
+  fecha_creacion     DateTime? @default(now()) @db.Timestamp(6)
+  fecha_modificacion DateTime? @default(now()) @db.Timestamp(6)
+  audios             audios[]
+}
