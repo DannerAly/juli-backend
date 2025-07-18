@@ -5,7 +5,6 @@ export class LoginAuthDto {
   @IsNotEmpty()
   correo: string;
 
-  @IsEmail()
   @IsNotEmpty()
   @MinLength(6)
   @MaxLength(20)

@@ -5,9 +5,9 @@ export class RegisterAuthDto extends LoginAuthDto{
 
     @IsString()
     @IsNotEmpty()
-    name: string;
+    nombre: string;
     
     @IsString()
     @IsOptional()
-    lastName?: string;
+    apellido?: string;
 }
