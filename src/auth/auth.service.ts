@@ -1,22 +1,68 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { compare } from 'bcrypt';
+import { encrypt } from 'src/libs/bcrypt';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private jwtService: JwtService,
+  ) {}
 
-  /*getUsers() {
-    return this.prismaService.usuarios.findMany();
-  }*/
-  async getUsers() {
+  async login(correo: string, clave: string) {
     try {
-        return await this.prismaService.usuarios.findMany();
+      const user = await this.prismaService.usuarios.findUnique({
+        where: { correo },
+      });
+
+      if (!user)
+        throw new BadRequestException('Email o contraseña incorrectos');
+
+      const isPasswordValid = await compare(clave, user.clave);
+
+      if (!isPasswordValid)
+        throw new BadRequestException('Email o contraseña incorrectos');
+
+      const payload = { id: user.id_usuario, correo: user.correo };
+
+      const accessToken = await this.jwtService.signAsync(payload)
+
+      return {
+        accessToken,
+        user: {
+          id: user.id_usuario,
+          nombre: user.nombre,
+          apellido: user.apellido,
+          correo: user.correo,
+        },
+      };
     } catch (error) {
-        throw new BadRequestException('Error al obtener los usuarios: ' + error.message);
+        if (error instanceof BadRequestException) {
+          throw error;
+        }
+
+        throw new InternalServerErrorException('Error al iniciar sesión: ' + error.message);
     }
   }
 
-  async singup(nombre: string, correo: string, clave: string, apellido?: string,) {
+  async getUsers() {
+    try {
+      return await this.prismaService.usuarios.findMany();
+    } catch (error) {
+      throw new BadRequestException(
+        'Error al obtener los usuarios: ' + error.message,
+      );
+    }
+  }
+
+  async singup(
+    nombre: string,
+    correo: string,
+    clave: string,
+    apellido?: string,
+  ) {
     //console.log('Registro de usuario:', { nombre, apellido, correo, clave });
 
     try {
@@ -29,16 +75,19 @@ export class AuthService {
       if (userFound)
         throw new BadRequestException('El correo ya está registrado');
 
+      const hashedPassword = await encrypt(clave, 10); // Asegúrate de usar un número adecuado para el salt
       const newUser = await this.prismaService.usuarios.create({
         data: {
           nombre,
           correo,
-          clave,
+          clave: hashedPassword,
           apellido: apellido ?? '', // Si apellido no se proporciona, se guarda como null
         },
       });
 
-      return newUser;
+      const { clave: _, ...userWithoutClave } = newUser; // Excluir la clave del objeto de respuesta
+
+      return userWithoutClave;
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error;
