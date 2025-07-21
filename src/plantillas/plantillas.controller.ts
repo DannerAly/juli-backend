@@ -6,12 +6,16 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { PlantillasService } from './plantillas.service';
 import { CreatePlantillaDto } from './dto/create-plantilla.dto';
 import { UpdatePlantillaDto } from './dto/update-plantilla.dto';
-import { ApiBody, ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation } from '@nestjs/swagger';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
 
+@UseGuards(AuthGuard)
+@ApiBearerAuth()
 @Controller('plantillas')
 export class PlantillasController {
   constructor(private readonly plantillasService: PlantillasService) {}
