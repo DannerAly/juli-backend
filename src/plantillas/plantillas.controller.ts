@@ -38,11 +38,52 @@ export class PlantillasController {
     return this.plantillasService.findAll();
   }
 
+  @ApiOperation({ summary: 'Obtener solo una plantilla'})
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.plantillasService.findOne(+id);
   }
 
+  @ApiBody({
+  description: 'Campos a actualizar (todos son opcionales)',
+  examples: {
+    'Solo nombre': {
+      summary: 'Actualizar solo el nombre',
+      value: {
+        nombre: 'Nuevo nombre de plantilla'
+      }
+    },
+    'Solo descripción': {
+      summary: 'Actualizar solo la descripción',
+      value: {
+        descripcion: 'Nueva descripción de la plantilla'
+      }
+    },
+    'Desactivar plantilla': {
+      summary: 'Cambiar estado a inactivo',
+      value: {
+        activo: false
+      }
+    },
+    'Actualización parcial': {
+      summary: 'Actualizar nombre y estado',
+      value: {
+        nombre: 'Plantilla modificada',
+        activo: true
+      }
+    },
+    'Actualización completa': {
+      summary: 'Actualizar todos los campos',
+      value: {
+        nombre: 'Plantilla completamente nueva',
+        descripcion: 'Descripción actualizada',
+        contenido_json: '{"titulo": "{{nuevo_campo}}", "contenido": "{{nuevo_contenido}}"}',
+        activo: true
+      }
+    }
+  }
+})
+  @ApiOperation({ summary: 'Actualizar una plantilla' })
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -51,6 +92,7 @@ export class PlantillasController {
     return this.plantillasService.update(+id, updatePlantillaDto);
   }
 
+  @ApiOperation({ summary: 'Eliminar una plantilla'})
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.plantillasService.remove(+id);

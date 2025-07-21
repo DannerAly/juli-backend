@@ -28,7 +28,13 @@ export class PlantillasService {
   }
 
   update(id: number, updatePlantillaDto: UpdatePlantillaDto) {
-    return `This action updates a #${id} plantilla`;
+    return this.prismaService.plantillas.update({
+      where: { id_plantilla: id },
+      data: {
+        ...updatePlantillaDto,
+        fecha_modificacion: new Date(),
+      }
+    });
   }
 
   remove(id: number) {
