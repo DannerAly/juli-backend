@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterAuthDto } from './dto/register-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { ApiBody, ApiOperation } from '@nestjs/swagger';
+import { AuthGuard } from './guards/auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -16,6 +17,7 @@ export class AuthController {
       },
     },
   })
+
   @ApiOperation({ summary: 'Iniciar Sesion' })
   @Post('log-in')
   logIn(@Body() usuario: LoginAuthDto) {
@@ -32,7 +34,9 @@ export class AuthController {
       },
     },
   })
+
   @ApiOperation({ summary: 'Registrarse' })
+  @UseGuards(AuthGuard)
   @Post('sing-up')
   singup(@Body() usuario: RegisterAuthDto) {
     console.log(usuario);
@@ -43,4 +47,12 @@ export class AuthController {
       usuario.apellido,
     );
   }
+
+
+  @Get('users')
+  @UseGuards(AuthGuard)
+  users(){
+    return this.authService.getUsers();
+  }
+
 }

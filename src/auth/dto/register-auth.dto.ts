@@ -10,4 +10,5 @@ export class RegisterAuthDto extends LoginAuthDto{
     @IsString()
     @IsOptional()
     apellido?: string;
+
 }

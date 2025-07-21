@@ -3,9 +3,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from './config/config.module';
 import { AuthModule } from './auth/auth.module';
+import { PlantillasModule } from './plantillas/plantillas.module';
 
 @Module({
-  imports: [ AuthModule, ConfigModule],
+  imports: [ AuthModule, ConfigModule, PlantillasModule],
   controllers: [AppController],
   providers: [AppService],
 })
