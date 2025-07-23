@@ -32,7 +32,6 @@ export class AuthService {
       return {
         accessToken,
         user: {
-          id: user.id_usuario,
           nombre: user.nombre,
           apellido: user.apellido,
           correo: user.correo,
@@ -57,12 +56,7 @@ export class AuthService {
     }
   }
 
-  async singup(
-    nombre: string,
-    correo: string,
-    clave: string,
-    apellido?: string,
-  ) {
+  async singup(nombre: string, correo: string, clave: string, apellido?: string,) {
     //console.log('Registro de usuario:', { nombre, apellido, correo, clave });
 
     try {
@@ -96,4 +90,40 @@ export class AuthService {
       throw new Error('Error al registrar el usuario: ' + error);
     }
   }
+/*
+  async singupWithGoogle(nombre: String, correo: string, apellido?:string){
+
+    try {
+      const user = await this.prismaService.usuarios.findUnique({
+        where: {
+          correo,
+        },
+      })
+
+      if (user) {
+        const payload = { id: user.id_usuario, correo: user.correo}
+
+        const accessToken = await this.jwtService.signAsync(payload)
+
+        return {
+          accessToken,
+          user: {
+            nombre: user.nombre,
+            apellido: user.apellido,
+            correo: user.correo,
+          },
+        };
+
+      const newUser = await this.prismaService.usuarios.create({
+        data: {
+          
+        }
+      })
+
+      }
+    } catch (error) {
+      
+    }
+
+  }*/
 }
