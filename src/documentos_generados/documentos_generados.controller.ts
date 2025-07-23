@@ -84,7 +84,7 @@ export class DocumentosGeneradosController {
     );
   }
 
-  @ApiOperation({ summary: 'Eliminar un documento generado por ID' })
+  @ApiOperation({ summary: 'Eliminar un documento generado por el ID:' })
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.documentosGeneradosService.remove(+id);
