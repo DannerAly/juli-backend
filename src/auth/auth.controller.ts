@@ -52,5 +52,16 @@ export class AuthController {
     );
   }
 
+  @Post('auth-firebase')
+  @ApiOperation({ summary: 'Autenticación con Firebase' })
+  authFirebase(@Body() usuario: RegisterAuthDto) {
+    return this.authService.authFirebase(
+      usuario.nombre,
+      usuario.correo,
+      usuario.apellido,
+    );
+
+  }
+
   
 }

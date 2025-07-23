@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { compare } from 'bcrypt';
 import { encrypt } from 'src/libs/bcrypt';
@@ -27,7 +31,7 @@ export class AuthService {
 
       const payload = { id: user.id_usuario, correo: user.correo };
 
-      const accessToken = await this.jwtService.signAsync(payload)
+      const accessToken = await this.jwtService.signAsync(payload);
 
       return {
         accessToken,
@@ -38,11 +42,13 @@ export class AuthService {
         },
       };
     } catch (error) {
-        if (error instanceof BadRequestException) {
-          throw error;
-        }
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
 
-        throw new InternalServerErrorException('Error al iniciar sesión: ' + error.message);
+      throw new InternalServerErrorException(
+        'Error al iniciar sesión: ' + error.message,
+      );
     }
   }
 
@@ -56,7 +62,12 @@ export class AuthService {
     }
   }
 
-  async singup(nombre: string, correo: string, clave: string, apellido?: string,) {
+  async singup(
+    nombre: string,
+    correo: string,
+    clave: string,
+    apellido?: string,
+  ) {
     //console.log('Registro de usuario:', { nombre, apellido, correo, clave });
 
     try {
@@ -90,20 +101,18 @@ export class AuthService {
       throw new Error('Error al registrar el usuario: ' + error);
     }
   }
-/*
-  async singupWithGoogle(nombre: String, correo: string, apellido?:string){
 
+  async authFirebase(nombre: string, correo: string, apellido?: string) {
     try {
       const user = await this.prismaService.usuarios.findUnique({
         where: {
           correo,
         },
-      })
+      });
 
       if (user) {
-        const payload = { id: user.id_usuario, correo: user.correo}
-
-        const accessToken = await this.jwtService.signAsync(payload)
+        const payload = { id: user.id_usuario, correo: user.correo };
+        const accessToken = await this.jwtService.signAsync(payload);
 
         return {
           accessToken,
@@ -113,17 +122,38 @@ export class AuthService {
             correo: user.correo,
           },
         };
+      }
 
+      // Usuario no existe - registrar y hacer login
       const newUser = await this.prismaService.usuarios.create({
         data: {
-          
-        }
-      })
+          nombre: nombre,
+          correo: correo,
+          clave: '', 
+          apellido: apellido ?? '',
+        },
+      });
 
-      }
+      // Generar JWT para el nuevo usuario
+      const payload = { id: newUser.id_usuario, correo: newUser.correo };
+      const accessToken = await this.jwtService.signAsync(payload);
+
+      return {
+        accessToken,
+        user: {
+          nombre: newUser.nombre,
+          apellido: newUser.apellido,
+          correo: newUser.correo,
+        },
+      };
     } catch (error) {
-      
-    }
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
 
-  }*/
+      throw new InternalServerErrorException(
+        'Error en autenticación con Firebase: ' + error.message,
+      );
+    }
+  }
 }
