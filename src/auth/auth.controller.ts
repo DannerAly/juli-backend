@@ -11,7 +11,6 @@ import { AuthService } from './auth.service';
 import { RegisterAuthDto } from './dto/register-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { ApiBody, ApiOperation } from '@nestjs/swagger';
-import { AuthGuard } from './guards/auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -42,7 +41,6 @@ export class AuthController {
     },
   })
   @ApiOperation({ summary: 'Registrarse' })
-  @UseGuards(AuthGuard)
   @Post('sing-up')
   singup(@Body() usuario: RegisterAuthDto) {
     console.log(usuario);
